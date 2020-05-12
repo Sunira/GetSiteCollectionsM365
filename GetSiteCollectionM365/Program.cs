@@ -28,8 +28,10 @@ namespace GetSiteCollectionsM365
         static void Main(string[] args)
         {
             //https://suniradev-admin.sharepoint.com/ - Test SharePoint Tenant URL
-            
+
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Attempting to Log into M365! ");
+            Console.ResetColor();
             LoginUsingM365();
         }
         private static void LoginUsingM365()
@@ -38,10 +40,13 @@ namespace GetSiteCollectionsM365
             bool isValidTenantURL;
 
             //Retrieve Admin Site URL from User via Console
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Please enter the M365 Admin Site URL.");
+            Console.ResetColor();
 
             //Verify it's a valid Tenant Site URL
-            do{
+            do
+            {
                 siteURL = Console.ReadLine();
                 isValidTenantURL = ValidateTenantURL(siteURL);
             } while (!isValidTenantURL);
@@ -50,11 +55,11 @@ namespace GetSiteCollectionsM365
             var authenticationManager = new OfficeDevPnP.Core.AuthenticationManager();
             ClientContext context = authenticationManager.GetWebLoginClientContext(siteURL, null);
             
-            GetAllTenantWebs(context);
+            GetAllTenantSites(context);
             
         }
 
-        private static void GetAllTenantWebs(ClientContext context)
+        private static void GetAllTenantSites(ClientContext context)
         {
             /*Get Site Collections under Tenant, including OneDrive Sites*/
             Tenant tenant = new Tenant(context);
@@ -73,7 +78,6 @@ namespace GetSiteCollectionsM365
                             siteUrl.Length < 1 ? "No Title" :
                             siteTitle; 
                 
-                Console.WriteLine(siteTitle + " : " + siteUrl + " Modified: " + lastMod.ToString());
                 records.Add(new M365SiteCollection { 
                     Name = siteTitle, 
                     Url = siteCol.Url.ToString(), 
@@ -86,12 +90,13 @@ namespace GetSiteCollectionsM365
 
         private static void SaveToCSV(List<M365SiteCollection> records)
         {
-            string fileName = "site-collections";
+            string fileName;
             string filePath = "/";
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Please Select the Folder to save the CSV file. Press Enter to Continue.");
             while (!(Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Enter))
             {
-                //Just Hang Out until I get a keypress.
+                //Just Hang Out until Enter is pressed.
             }
 
             FolderBrowserDialog fbd = new FolderBrowserDialog();
@@ -102,12 +107,16 @@ namespace GetSiteCollectionsM365
 
             do
             {
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.WriteLine("Please give the .csv file a name, without the extension.");
+                Console.ResetColor();
                 fileName = Console.ReadLine();
             } while (fileName.Length < 1);
 
             string fileRoute = filePath + "/" + fileName + ".csv";
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Saving to :" + fileRoute);
+            Console.ResetColor();
 
             using (var writer = new StreamWriter(fileRoute))
             {
@@ -124,22 +133,32 @@ namespace GetSiteCollectionsM365
 
             if ((siteURL.Length < 1))
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Not a valid URL.");
+                Console.ResetColor();
                 isValidTenantURL = false;
             }
 
             if (!siteURL.Contains("https://"))
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Please enter a URL that starts with https://");
+                Console.ResetColor();
                 isValidTenantURL = false;
             }
 
             if (!siteURL.Contains("-admin.sharepoint.com"))
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("The site should end with '-admin.sharepoint.com/'");
+                Console.ResetColor();
                 isValidTenantURL = false;
-            }
 
+            }
+            if (!isValidTenantURL) { 
+                Console.ForegroundColor = ConsoleColor.White; 
+                Console.WriteLine("Please try again."); 
+            };
             return isValidTenantURL;
         }
 
