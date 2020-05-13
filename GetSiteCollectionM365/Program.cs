@@ -51,17 +51,17 @@ namespace GetSiteCollectionsM365
                 isValidTenantURL = ValidateTenantURL(siteURL);
             } while (!isValidTenantURL);
 
-            //Authenticate using M365
+            //Authenticate using M365 Pop Up Auth Window ( to handle MFA too )
             var authenticationManager = new OfficeDevPnP.Core.AuthenticationManager();
             ClientContext context = authenticationManager.GetWebLoginClientContext(siteURL, null);
-            
+
             GetAllTenantSites(context);
-            
+
         }
 
         private static void GetAllTenantSites(ClientContext context)
         {
-            /*Get Site Collections under Tenant, including OneDrive Sites*/
+            // Get Site Collections under Tenant, including OneDrive Sites 
             Tenant tenant = new Tenant(context);
             IList<SiteEntity> siteCols = tenant.GetSiteCollections(startIndex: 0, includeDetail: true, includeOD4BSites: true);
 
@@ -76,12 +76,13 @@ namespace GetSiteCollectionsM365
                 siteTitle = siteUrl.Contains("-my.sharepoint.com") ? "Onedrive for Business" :
                     siteUrl.Contains(".sharepoint.com/search") ? "Search" :
                             siteUrl.Length < 1 ? "No Title" :
-                            siteTitle; 
-                
-                records.Add(new M365SiteCollection { 
-                    Name = siteTitle, 
-                    Url = siteCol.Url.ToString(), 
-                    LastModified = lastMod 
+                            siteTitle;
+
+                records.Add(new M365SiteCollection
+                {
+                    Name = siteTitle,
+                    Url = siteCol.Url.ToString(),
+                    LastModified = lastMod
                 });
             }
 
@@ -93,10 +94,10 @@ namespace GetSiteCollectionsM365
             string fileName;
             string filePath = "/";
             Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("Please Select the Folder to save the CSV file. Press Enter to Continue.");
+            Console.WriteLine("Please Select the Folder in which to save the CSV file! Press Enter to Continue.");
             while (!(Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Enter))
             {
-                //Just Hang Out until Enter is pressed.
+                //Just Hang Out until Enter is pressed. I want the user to know this is where the .csv file goes.
             }
 
             FolderBrowserDialog fbd = new FolderBrowserDialog();
@@ -130,35 +131,31 @@ namespace GetSiteCollectionsM365
         private static bool ValidateTenantURL(string siteURL)
         {
             bool isValidTenantURL = true;
-
+            Console.ForegroundColor = ConsoleColor.Red;
             if ((siteURL.Length < 1))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Not a valid URL.");
-                Console.ResetColor();
                 isValidTenantURL = false;
             }
 
             if (!siteURL.Contains("https://"))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Please enter a URL that starts with https://");
-                Console.ResetColor();
+                Console.WriteLine("Please enter secure URL that starts with https://");
                 isValidTenantURL = false;
             }
 
             if (!siteURL.Contains("-admin.sharepoint.com"))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("The site should end with '-admin.sharepoint.com/'");
-                Console.ResetColor();
+                Console.WriteLine("The site should end with '-admin.sharepoint.com'");
                 isValidTenantURL = false;
-
             }
-            if (!isValidTenantURL) { 
-                Console.ForegroundColor = ConsoleColor.White; 
-                Console.WriteLine("Please try again."); 
+            if (!isValidTenantURL)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.WriteLine("Please try again.");
             };
+
+            Console.ResetColor();
             return isValidTenantURL;
         }
 
