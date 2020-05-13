@@ -126,6 +126,9 @@ namespace GetSiteCollectionsM365
                     csv.WriteRecords(records);
                 }
             }
+
+            Console.WriteLine("File has been saved to selected location. Press any key to close.");
+            Console.ReadKey();
         }
 
         private static bool ValidateTenantURL(string siteURL)
