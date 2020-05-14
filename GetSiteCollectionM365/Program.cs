@@ -27,7 +27,6 @@ namespace GetSiteCollectionsM365
         [STAThread]
         static void Main(string[] args)
         {
-            //https://suniradev-admin.sharepoint.com/ - Test SharePoint Tenant URL
 
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Attempting to Log into M365! ");
@@ -54,7 +53,6 @@ namespace GetSiteCollectionsM365
             //Authenticate using M365 Pop Up Auth Window ( to handle MFA too )
             var authenticationManager = new OfficeDevPnP.Core.AuthenticationManager();
             ClientContext context = authenticationManager.GetWebLoginClientContext(siteURL, null);
-
             GetAllTenantSites(context);
 
         }
